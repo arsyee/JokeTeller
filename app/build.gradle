@@ -38,7 +38,8 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation project(':jokeprovider')
+    implementation project(path: ':jokeprovider')
+    implementation project(path: ':jokeshower')
     endpointsServer project(path: ':backend', configuration: 'endpoints')
     implementation "com.android.support:appcompat-v7:$supportVersion"
     implementation "com.android.support:customtabs:$supportVersion"

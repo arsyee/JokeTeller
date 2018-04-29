@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">JokeShower</string>
+    <string name="no_joke">Joke not loaded, yet</string>
+</resources>
