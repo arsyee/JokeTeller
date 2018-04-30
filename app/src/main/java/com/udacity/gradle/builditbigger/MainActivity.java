@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.test.espresso.idling.CountingIdlingResource;
 import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -22,6 +23,8 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 
 public class MainActivity extends AppCompatActivity {
+
+    public final CountingIdlingResource countingIdlingResource = new CountingIdlingResource(EndpointsAsyncTask.class.getSimpleName());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,16 +59,17 @@ public class MainActivity extends AppCompatActivity {
         new EndpointsAsyncTask(this).execute();
     }
 
-    static class EndpointsAsyncTask extends AsyncTask<Void, Void, String> {
+    public static class EndpointsAsyncTask extends AsyncTask<Void, Void, String> {
         private MyApi myApiService = null;
-        private final WeakReference<Context> contextRef;
+        private final WeakReference<MainActivity> activityRef;
 
-        EndpointsAsyncTask(Context context) {
-            contextRef = new WeakReference<>(context.getApplicationContext());
+        EndpointsAsyncTask(MainActivity activity) {
+            activityRef = new WeakReference<>(activity);
         }
 
         @Override
         protected String doInBackground(Void... params) {
+            activityRef.get().countingIdlingResource.increment();
             if(myApiService == null) {  // Only do this once
                 MyApi.Builder builder = new MyApi.Builder(AndroidHttp.newCompatibleTransport(),
                         new AndroidJsonFactory(), null)
@@ -93,10 +97,11 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {
-            Context context = contextRef.get();
+            Context context = activityRef.get();
             Intent intent = new Intent(context, JokeActivity.class);
             intent.putExtra(JokeActivity.JOKE_EXTRA, result);
             context.startActivity(intent);
+            activityRef.get().countingIdlingResource.decrement();
         }
     }
 
