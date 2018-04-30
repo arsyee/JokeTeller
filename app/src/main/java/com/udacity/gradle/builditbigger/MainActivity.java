@@ -19,6 +19,7 @@ import com.udacity.gradle.builditbigger.backend.myApi.MyApi;
 import com.udacity.gradle.jokeshower.JokeActivity;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -52,12 +53,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void tellJoke(View view) {
-        new EndpointsAsyncTask().execute();
+        new EndpointsAsyncTask(this).execute();
     }
 
-    class EndpointsAsyncTask extends AsyncTask<Void, Void, String> {
+    static class EndpointsAsyncTask extends AsyncTask<Void, Void, String> {
         private MyApi myApiService = null;
-        private Context context;
+        private final WeakReference<Context> contextRef;
+
+        EndpointsAsyncTask(Context context) {
+            contextRef = new WeakReference<>(context.getApplicationContext());
+        }
 
         @Override
         protected String doInBackground(Void... params) {
@@ -88,9 +93,10 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {
-            Intent intent = new Intent(MainActivity.this, JokeActivity.class);
+            Context context = contextRef.get();
+            Intent intent = new Intent(context, JokeActivity.class);
             intent.putExtra(JokeActivity.JOKE_EXTRA, result);
-            startActivity(intent);
+            context.startActivity(intent);
         }
     }
 
