@@ -20,14 +20,14 @@ public class JokeProvider {
         } catch (JokeException e) {
             return e.getMessage();
         }
-        return String.format(Locale.getDefault(), "The best joke so far: Internet connection work reliably on server side in %d", Calendar.getInstance().get(Calendar.YEAR));
+        return String.format(Locale.getDefault(), "The best joke so far: Internet connection works reliably on server side in %d", Calendar.getInstance().get(Calendar.YEAR));
     }
 
     private static String getJoke(JsonObject jsonObject) throws JokeException {
         try {
             String type = jsonObject.getString("type", null);
             if (!"success".equals(type))
-                throw new JokeException(String.format("Chuck Norris can read a joke from the API even if it's type is '%s'.", type));
+                throw new JokeException(String.format(Locale.getDefault(), "Chuck Norris can read a joke from the API even if it's type is '%s'.", type));
             JsonObject value = jsonObject.getJsonObject("value");
             return value.getString("joke");
         } catch (Exception e) {
